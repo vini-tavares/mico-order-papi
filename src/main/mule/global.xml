@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:mico-order-system-api="http://www.mulesoft.org/schema/mule/mico-order-system-api"
+	xmlns:mico-customer-system-api="http://www.mulesoft.org/schema/mule/mico-customer-system-api"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mico-customer-system-api http://www.mulesoft.org/schema/mule/mico-customer-system-api/current/mule-mico-customer-system-api.xsd
+http://www.mulesoft.org/schema/mule/mico-order-system-api http://www.mulesoft.org/schema/mule/mico-order-system-api/current/mule-mico-order-system-api.xsd">
+
+	<http:listener-config name="httpListenerConfig">
+		<http:listener-connection
+			host="${http.host}"
+			port="${http.port}" />
+	</http:listener-config>
+
+	<apikit:config
+		name="mico-order-papi-config"
+		api="${api.spec}"
+		outboundHeadersMapName="outboundHeaders"
+		httpStatusVarName="httpStatus" />
+
+	<configuration-properties
+		doc:name="configurationProperties"
+		doc:id="d54c292c-d1e6-44b7-b986-aba33468b776"
+		file="properties.yaml" />
+
+	<configuration-properties
+		doc:name="env-dependentConfigurationProperties"
+		doc:id="b2ea5389-c0e3-4508-bbcd-f1224f61a024"
+		file="properties-${env}.yaml" />
+
+	<global-property
+		doc:name="Global Property"
+		doc:id="40a42ee1-9bac-4321-b176-32db25ea9545"
+		name="env"
+		value="dev" />
+	<mico-customer-system-api:config name="Mico_Customer_System_API_Config" doc:name="Mico Customer System API Config" doc:id="b37d4381-4def-48f4-9d2a-abb954b6198c" property_host="localhost" property_port="8082" property_protocol="HTTP" property_client-id="temp" property_client-secret="temp" property_basePath="/api/${api.majorVersion}" />
+	<mico-order-system-api:config name="Mico_Order_System_API_Config" doc:name="Mico Order System API Config" doc:id="5536156b-9758-4656-bec6-f2a2bfa6f559" property_host="localhost" property_port="8083" property_protocol="HTTP" property_client-id="temp" property_client-secret="temp" property_basePath="/api/${api.majorVersion}" />
+		
+</mule>

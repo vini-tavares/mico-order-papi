@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:mico-order-system-api="http://www.mulesoft.org/schema/mule/mico-order-system-api"
+	xmlns:mico-customer-system-api="http://www.mulesoft.org/schema/mule/mico-customer-system-api"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mico-customer-system-api http://www.mulesoft.org/schema/mule/mico-customer-system-api/current/mule-mico-customer-system-api.xsd
+http://www.mulesoft.org/schema/mule/mico-order-system-api http://www.mulesoft.org/schema/mule/mico-order-system-api/current/mule-mico-order-system-api.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getCustomerFlow" doc:id="8368cab5-3736-468e-b1d0-f1bd0574f03b" >
+		<mico-customer-system-api:get-customers doc:name="Get customers from Mico Customer SAPI" doc:id="e5336e9d-abda-4e1b-b6b7-9404ad62592a" config-ref="Mico_Customer_System_API_Config"/>
+		<logger level="INFO" doc:name="Payload" doc:id="48126603-df75-4dcb-b26e-6e334b6847b1" message="#[payload]"/>
+	</flow>
+	<flow name="getOrdersFlow" doc:id="f75a1266-3b24-4854-ad2d-3bba84a29612" >
+		<mico-order-system-api:get-orders doc:name="Get orders from Mico Order SAPI" doc:id="f6c9e3e6-d215-42c7-b1b3-afe1631a0ffb" config-ref="Mico_Order_System_API_Config" initial-id="#[attributes.queryParams.'initialId' as Number]" final-id="#[attributes.queryParams.'finalId' as Number]"/>
+		<logger level="INFO" doc:name="Payload" doc:id="d48ea613-1d7a-43b4-aac7-e74007b0f8cc" message="#[payload]"/>
+	</flow>
+	<flow name="postOrdersFlow" doc:id="e7fbb6e6-43f3-4ab3-bd4c-65453a658ed6" >
+		<mico-customer-system-api:post-customer doc:name="Post customer by calling Mico Customer SAPI" doc:id="b7a837fb-fba0-4149-b6d5-824377adc2d7" config-ref="Mico_Customer_System_API_Config" target="customer">
+			<error-mapping targetType="APP:CUSTOMER-SAPI" />
+			<mico-customer-system-api:post-customer-request-data ><![CDATA[#[%dw 2.0
+output application/json
+---
+payload.customer]]]></mico-customer-system-api:post-customer-request-data>
+		</mico-customer-system-api:post-customer>
+		<mico-order-system-api:post-order doc:name="Post order by calling Mico Order SAPI" doc:id="b9b779fa-3717-44b1-937b-10121713c187" config-ref="Mico_Order_System_API_Config" target="order">
+			<error-mapping targetType="APP:ORDER-SAPI" />
+			<mico-order-system-api:post-order-request-data ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	"orderData": 
+		{	
+			"poNumber": message.payload.'orderData'.poNumber,
+        	"signatureRequiredFlag": message.payload.'orderData'.signatureRequiredFlag,
+        	"shipInstructions": message.payload.'orderData'.shipInstructions,
+        	"giftWrapFlag": message.payload.'orderData'.giftWrapFlag,
+        	"giftWrapMessage": message.payload.'orderData'.giftWrapMessage,
+        	"currencyCode": message.payload.'orderData'.currencyCode,
+        	"subTotal": message.payload.'orderData'.subTotal,
+        	"customerSalesforceId": vars.customer.salesforceId
+		},
+	"items": message.payload.'items'
+}]]]></mico-order-system-api:post-order-request-data>
+		</mico-order-system-api:post-order>
+		<ee:transform doc:name="Transform Message" doc:id="9984a573-82dd-4323-8eb6-6e71131a7662" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"orderSalesforceId": vars.order.salesforceId,
+	"customerSalesforceId": vars.customer.salesforceId
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Payload" doc:id="0bbfc29e-c697-4f76-812b-324a227b59e9" message="#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="0fcfeac6-3a71-4c16-b4e6-e0c4021b00a9" type="APP:CUSTOMER-SAPI, APP:ORDER-SAPI"/>
+		</error-handler>
+	</flow>
+</mule>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mico-customer-system-api="http://www.mulesoft.org/schema/mule/mico-customer-system-api" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/mico-customer-system-api http://www.mulesoft.org/schema/mule/mico-customer-system-api/current/mule-mico-customer-system-api.xsd">
+	<flow name="healthAliveFlow" doc:id="641ead4a-0302-4343-947d-eb39af6067b4" >
+		<ee:transform doc:name="Alive" doc:id="a9f99df6-4a9d-4dcc-985a-1e2f3a935ef0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  status: "ALIVE"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Payload" doc:id="af20916a-114c-4610-b20c-e13fec7148fe" message="#[payload]" />
+	</flow>
+	<flow name="healthReadyFlow" doc:id="4a450995-6c69-49f8-b1bd-4fb97064b832" >
+		<mico-customer-system-api:ready-health-endpoint doc:name="READY Health Endpoint" doc:id="3cabfbfa-37d6-4953-8104-54d579f07866" config-ref="Mico_Customer_System_API_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f79f8370-ef59-4259-9046-113a69b0514b" />
+	</flow>
+</mule>
