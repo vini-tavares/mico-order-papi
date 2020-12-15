@@ -23,7 +23,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		</http:listener>
 		<apikit:router config-ref="mico-order-papi-config" />
 		<error-handler>
-			<on-error-propagate type="APIKIT:BAD_REQUEST">
+			<on-error-propagate type="APIKIT:BAD_REQUEST, APP:BAD_REQUEST" enableNotifications="true" logException="true">
 				<ee:transform
 					xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 					xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
@@ -31,10 +31,13 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{message: "Bad request"}]]></ee:set-payload>
+{
+	"errorMessage": "Bad request",
+	"description": error.description
+}]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus">400</ee:set-variable>
+						<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
 			</on-error-propagate>
@@ -46,10 +49,13 @@ output application/json
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{message: "Resource not found"}]]></ee:set-payload>
+{
+	"errorMessage": "Resource not found",
+	"description": error.description
+}]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus">404</ee:set-variable>
+						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
 			</on-error-propagate>
@@ -61,10 +67,13 @@ output application/json
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{message: "Method not allowed"}]]></ee:set-payload>
+{
+	"errorMessage": "Method not allowed",
+	"description": error.description
+}]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus">405</ee:set-variable>
+						<ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
 			</on-error-propagate>
@@ -76,10 +85,13 @@ output application/json
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{message: "Not acceptable"}]]></ee:set-payload>
+{
+	"errorMessage": "Not acceptable",
+	"description": error.description
+}]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus">406</ee:set-variable>
+						<ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
 			</on-error-propagate>
@@ -91,10 +103,13 @@ output application/json
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{message: "Unsupported media type"}]]></ee:set-payload>
+{
+	"errorMessage": "Unsupported media type",
+	"description": error.description
+}]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus">415</ee:set-variable>
+						<ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
 			</on-error-propagate>
@@ -106,10 +121,61 @@ output application/json
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{message: "Not Implemented"}]]></ee:set-payload>
+{
+	"errorMessage": "Not Implemented",
+	"description": error.description
+}]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus">501</ee:set-variable>
+						<ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9873ae87-cf7f-43b9-87a0-dc76a2d70e5a" type="APP:INTERNAL_SERVER_ERROR">
+				<ee:transform doc:name="Transform Message" doc:id="220f4d66-739f-48c1-84b7-7f5d588f35db" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorMessage": "Server side error!",
+	"description": error.description
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2b33dddd-29a2-4de3-8f23-3587263a2034" type="APP:CUSTOMER_NOT_FOUND" >
+				<ee:transform doc:name="Transform Message" doc:id="80b0e81e-1916-4a48-95ac-5804e57745ec" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorMessage: "Customers not found!",
+	description: error.description
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8429acd7-a2cc-467b-9144-b5664818d982" type="APP:ORDER_NOT_FOUND" >
+				<ee:transform doc:name="Transform Message" doc:id="dee1bede-29a5-4ece-91e4-3d9a8827783a" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorMessage: "Orders not found!",
+	description: error.description
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
 			</on-error-propagate>
@@ -140,10 +206,13 @@ output application/json
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{message: "Resource not found"}]]></ee:set-payload>
+{
+	"errorMessage": "Resource not found",
+	"description": error.description
+}]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus">404</ee:set-variable>
+						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
 			</on-error-propagate>
@@ -158,7 +227,7 @@ output application/json
 
 
 
-	<flow name="get:\customer:mico-order-papi-config">
+	<flow name="get:\customers:mico-order-papi-config">
 		<flow-ref doc:name="getCustomerFlow" doc:id="80295c2b-f046-4b0d-acf9-5fc2c81ef934" name="getCustomerFlow"/>
 	</flow>
 
