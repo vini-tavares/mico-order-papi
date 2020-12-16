@@ -17,18 +17,30 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<mico-customer-system-api:get-customers
 			doc:name="Get customers from Mico Customer SAPI"
 			doc:id="e5336e9d-abda-4e1b-b6b7-9404ad62592a"
-			config-ref="Mico_Customer_System_API_Config" initial-id="#[attributes.queryParams.'initialId']" final-id="#[attributes.queryParams.'finalId']">
-			<error-mapping
-				sourceType="MICO-CUSTOMER-SYSTEM-API:INTERNAL_SERVER_ERROR"
-				targetType="APP:INTERNAL_SERVER_ERROR" />
-			<error-mapping sourceType="MICO-CUSTOMER-SYSTEM-API:BAD_REQUEST" targetType="APP:BAD_REQUEST" />
-			<error-mapping sourceType="MICO-CUSTOMER-SYSTEM-API:NOT_FOUND" targetType="APP:CUSTOMER_NOT_FOUND" />
+			config-ref="Mico_Customer_System_API_Config"
+			initial-id="#[attributes.queryParams.'initialId']"
+			final-id="#[attributes.queryParams.'finalId']">
 		</mico-customer-system-api:get-customers>
 		<logger
 			level="INFO"
 			doc:name="Payload"
 			doc:id="48126603-df75-4dcb-b26e-6e334b6847b1"
 			message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3b2bf1f0-fe21-405b-9828-df6bcef73933" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="c1cd08db-dca8-46a5-8f66-5f3ca9cbcfd3" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorMessage.payload]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 	<flow
 		name="getOrdersFlow"
@@ -39,39 +51,6 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 			config-ref="Mico_Order_System_API_Config"
 			initial-id="#[attributes.queryParams.'initialId' as Number]"
 			final-id="#[attributes.queryParams.'finalId' as Number]">
-			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:INTERNAL_SERVER_ERROR" targetType="APP:INTERNAL_SERVER_ERROR" />
-			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:BAD_REQUEST" targetType="APP:BAD_REQUEST" />
-			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:NOT_FOUND" targetType="APP:ORDER_NOT_FOUND" />
-		</mico-order-system-api:get-orders>
-		<logger
-			level="INFO"
-			doc:name="Payload"
-			doc:id="d48ea613-1d7a-43b4-aac7-e74007b0f8cc"
-			message="#[payload]" />
-	</flow>
-	<flow
-		name="postOrdersFlow"
-		doc:id="e7fbb6e6-43f3-4ab3-bd4c-65453a658ed6">
-		<mico-customer-system-api:post-customer
-			doc:name="Post customer by calling Mico Customer SAPI"
-			doc:id="b7a837fb-fba0-4149-b6d5-824377adc2d7"
-			config-ref="Mico_Customer_System_API_Config"
-			target="customer">
-			<error-mapping
-				sourceType="MICO-CUSTOMER-SYSTEM-API:INTERNAL_SERVER_ERROR"
-				targetType="APP:INTERNAL_SERVER_ERROR" />
-			<error-mapping sourceType="MICO-CUSTOMER-SYSTEM-API:BAD_REQUEST" targetType="APP:BAD_REQUEST" />
-			<error-mapping sourceType="MICO-CUSTOMER-SYSTEM-API:NOT_FOUND" targetType="APP:CUSTOMER_NOT_FOUND" />
-			<mico-customer-system-api:post-customer-request-data ><![CDATA[#[%dw 2.0
-output application/json
----
-payload.customer]]]></mico-customer-system-api:post-customer-request-data>
-		</mico-customer-system-api:post-customer>
-		<mico-order-system-api:post-order
-			doc:name="Post order by calling Mico Order SAPI"
-			doc:id="b9b779fa-3717-44b1-937b-10121713c187"
-			config-ref="Mico_Order_System_API_Config"
-			target="order">
 			<error-mapping
 				sourceType="MICO-ORDER-SYSTEM-API:INTERNAL_SERVER_ERROR"
 				targetType="APP:INTERNAL_SERVER_ERROR" />
@@ -81,6 +60,59 @@ payload.customer]]]></mico-customer-system-api:post-customer-request-data>
 			<error-mapping
 				sourceType="MICO-ORDER-SYSTEM-API:NOT_FOUND"
 				targetType="APP:ORDER_NOT_FOUND" />
+		</mico-order-system-api:get-orders>
+		<logger
+			level="INFO"
+			doc:name="Payload"
+			doc:id="d48ea613-1d7a-43b4-aac7-e74007b0f8cc"
+			message="#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="16bbd401-b332-4b11-9b7b-5c0d2aea6586" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="b334a81f-87d6-4c01-ac01-3803f7c4116c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorMessage.payload]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow
+		name="postOrdersFlow"
+		doc:id="e7fbb6e6-43f3-4ab3-bd4c-65453a658ed6">
+		<try doc:name="Try" doc:id="6ef2fbeb-105b-4768-b2cd-5f8596544717" >
+			<mico-customer-system-api:post-customer doc:name="Post customer by calling Mico Customer SAPI" doc:id="b7a837fb-fba0-4149-b6d5-824377adc2d7" config-ref="Mico_Customer_System_API_Config" target="customer" targetValue="#[message]">
+			<mico-customer-system-api:post-customer-request-data><![CDATA[#[%dw 2.0
+output application/json
+---
+payload.customer]]]></mico-customer-system-api:post-customer-request-data>
+		</mico-customer-system-api:post-customer>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2dcda097-e389-4061-825e-ac25f5b99bbf" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="f397d4ab-edf4-4094-973a-a05e5606c920">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+error.errorMessage.payload]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			</error-handler>
+		</try>
+		<try doc:name="Try" doc:id="b5c165fb-6434-42fc-9eeb-671a28154f1e" >
+			<mico-order-system-api:post-order doc:name="Post order by calling Mico Order SAPI" doc:id="b9b779fa-3717-44b1-937b-10121713c187" config-ref="Mico_Order_System_API_Config" target="order" targetValue="#[message]">
+			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:INTERNAL_SERVER_ERROR" targetType="APP:INTERNAL_SERVER_ERROR" />
+			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:BAD_REQUEST" targetType="APP:BAD_REQUEST" />
+			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:NOT_FOUND" targetType="APP:ORDER_NOT_FOUND" />
 			<mico-order-system-api:post-order-request-data><![CDATA[#[%dw 2.0
 output application/json
 ---
@@ -94,11 +126,27 @@ output application/json
         	"giftWrapMessage": message.payload.'orderData'.giftWrapMessage,
         	"currencyCode": message.payload.'orderData'.currencyCode,
         	"subTotal": message.payload.'orderData'.subTotal,
-        	"customerSalesforceId": vars.customer.salesforceId
+        	"customerSalesforceId": vars.customer.payload.salesforceId
 		},
 	"items": message.payload.'items'
 }]]]></mico-order-system-api:post-order-request-data>
 		</mico-order-system-api:post-order>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c0354185-70ee-4ec0-93bb-d94cce7eea99" type="ANY" >
+					<ee:transform doc:name="Transform Message" doc:id="afecb392-703b-424c-bcc0-f0acdc69356c" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorMessage.payload]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="httpStatus" ><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</on-error-propagate>
+			</error-handler>
+		</try>
 		<ee:transform
 			doc:name="Transform Message"
 			doc:id="9984a573-82dd-4323-8eb6-6e71131a7662">
@@ -107,10 +155,15 @@ output application/json
 output application/json
 ---
 {
-	"orderSalesforceId": vars.order.salesforceId,
-	"customerSalesforceId": vars.customer.salesforceId
+	"orderSalesforceId": vars.order.payload.salesforceId,
+	"customerSalesforceId": vars.customer.payload.salesforceId
 }]]></ee:set-payload>
 			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="outboundHeaders" ><![CDATA[{
+	"Location": vars.customer.attributes.headers.location as String ++ "         " ++ vars.order.attributes.headers.location as String
+}]]></ee:set-variable>
+			</ee:variables>
 		</ee:transform>
 		<logger
 			level="INFO"
