@@ -1,28 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-
-
-
-	<flow name="mico-order-papi-main">
-		<http:listener
-			config-ref="httpListenerConfig"
-			path="/api/${api.majorVersion}/*">
-			<http:response statusCode="#[vars.httpStatus default 200]">
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
-			</http:response>
-			<http:error-response statusCode="#[vars.httpStatus default 500]">
-				<http:body>#[payload]</http:body>
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
-			</http:error-response>
-		</http:listener>
-		<apikit:router config-ref="mico-order-papi-config" />
-		<error-handler>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+    <flow name="mico-order-papi-main">
+        <http:listener config-ref="httpListenerConfig" path="/api/${api.majorVersion}/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="mico-order-papi-config" />
+        <error-handler>
 			<on-error-propagate type="APIKIT:BAD_REQUEST" enableNotifications="true" logException="true">
 				<ee:transform
 					xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
@@ -153,7 +143,9 @@ output application/json
 			<on-error-propagate type="APIKIT:NOT_FOUND">
 				<ee:transform
 					xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-					xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+					xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -169,33 +161,26 @@ output application/json
 				</ee:transform>
 			</on-error-propagate>
 		</error-handler>
-	</flow>
-
-
-
-	<flow name="get:\alive:mico-order-papi-config">
-		<flow-ref doc:name="healthAliveFlow" doc:id="2af4b229-dd5a-42f5-a899-9af0cca67f98" name="healthAliveFlow"/>
-	</flow>
-
-
-
-	<flow name="get:\customers:mico-order-papi-config">
-		<flow-ref doc:name="getCustomerFlow" doc:id="80295c2b-f046-4b0d-acf9-5fc2c81ef934" name="getCustomerFlow"/>
-	</flow>
-
-
-
-	<flow name="get:\orders:mico-order-papi-config">
-		<flow-ref doc:name="getOrdersFlow" doc:id="f93a917f-4ed9-405c-95ed-cac02e39ba6c" name="getOrdersFlow"/>
-	</flow>
-
-
-
-	<flow name="get:\ready:mico-order-papi-config">
-		<flow-ref doc:name="healthReadyFlow" doc:id="b58e76c8-87ec-4eed-8dc2-80f99152247d" name="healthReadyFlow"/>
-	</flow>
-	<flow name="post:\orders:application\json:mico-order-papi-config">
-		<flow-ref doc:name="postOrdersFlow" doc:id="192f6a27-5fe4-4b34-a56a-afd4a39c776a" name="postOrdersFlow" />
-	</flow>
-
+    </flow>
+    <flow name="get:\alive:mico-order-papi-config">
+		<flow-ref doc:name="healthAliveFlow" doc:id="409a0a79-37fe-47ef-a19f-a503205a938f" name="healthAliveFlow"/>
+    </flow>
+    <flow name="get:\customers:mico-order-papi-config">
+		<flow-ref doc:name="getCustomerFlow" doc:id="06198a21-103b-4586-b3b0-dda3b38778cd" name="getCustomerFlow"/>
+    </flow>
+    <flow name="get:\orders:mico-order-papi-config">
+		<flow-ref doc:name="getOrdersFlow" doc:id="d5926a56-1c0d-413e-9508-1a4ef9c38712" name="getOrdersFlow"/>
+    </flow>
+    <flow name="get:\ready:mico-order-papi-config">
+		<flow-ref doc:name="healthReadyFlow" doc:id="ff9f4f92-083f-4109-a183-389edbe74827" name="healthReadyFlow"/>
+    </flow>
+    <flow name="get:\orders\(salesforceId):mico-order-papi-config">
+		<flow-ref doc:name="getOrderByIdFlow" doc:id="37e6c0c6-3bfc-4b9f-9468-c607ffc5009f" name="getOrderByIdFlow"/>
+    </flow>
+    <flow name="get:\customers\(salesforceId):mico-order-papi-config">
+		<flow-ref doc:name="getCustomerByIdFlow" doc:id="ddc8f9a3-692f-4a57-b938-9ad61a038c5d" name="getCustomerByIdFlow"/>
+    </flow>
+    <flow name="post:\orders:application\json:mico-order-papi-config">
+		<flow-ref doc:name="postOrdersFlow" doc:id="f931ed15-cdff-42d9-a3a9-c156cfdfc759" name="postOrdersFlow"/>
+    </flow>
 </mule>

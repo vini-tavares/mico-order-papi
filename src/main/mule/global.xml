@@ -6,7 +6,9 @@
 	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/mico-customer-system-api http://www.mulesoft.org/schema/mule/mico-customer-system-api/current/mule-mico-customer-system-api.xsd
@@ -20,7 +22,7 @@ http://www.mulesoft.org/schema/mule/mico-order-system-api http://www.mulesoft.or
 
 	<apikit:config
 		name="mico-order-papi-config"
-		api="${api.spec}"
+		api="resource::cd8b296d-8848-4a91-98ed-4a47f73703bd:mico-order-papi:1.0.8:raml:zip:mico-order-papi.raml"
 		outboundHeadersMapName="outboundHeaders"
 		httpStatusVarName="httpStatus" />
 
@@ -39,7 +41,34 @@ http://www.mulesoft.org/schema/mule/mico-order-system-api http://www.mulesoft.or
 		doc:id="40a42ee1-9bac-4321-b176-32db25ea9545"
 		name="env"
 		value="dev" />
-	<mico-customer-system-api:config name="Mico_Customer_System_API_Config" doc:name="Mico Customer System API Config" doc:id="b37d4381-4def-48f4-9d2a-abb954b6198c" property_host="localhost" property_port="8082" property_protocol="HTTP" property_client-id="temp" property_client-secret="temp" property_basePath="/api/${api.majorVersion}" />
-	<mico-order-system-api:config name="Mico_Order_System_API_Config" doc:name="Mico Order System API Config" doc:id="5536156b-9758-4656-bec6-f2a2bfa6f559" property_host="localhost" property_port="8083" property_protocol="HTTP" property_client-id="temp" property_client-secret="temp" property_basePath="/api/${api.majorVersion}" />
-		
+
+	<mico-customer-system-api:config
+		name="Mico_Customer_System_API_Config"
+		doc:name="Mico Customer System API Config"
+		doc:id="b37d4381-4def-48f4-9d2a-abb954b6198c"
+		property_host="localhost"
+		property_port="8082"
+		property_protocol="HTTP"
+		property_client-id="temp"
+		property_client-secret="temp"
+		property_basePath="/api/${api.majorVersion}" />
+
+	<mico-order-system-api:config
+		name="Mico_Order_System_API_Config"
+		doc:name="Mico Order System API Config"
+		doc:id="5536156b-9758-4656-bec6-f2a2bfa6f559"
+		property_host="localhost"
+		property_port="8083"
+		property_protocol="HTTP"
+		property_client-id="temp"
+		property_client-secret="temp"
+		property_basePath="/api/${api.majorVersion}" />
+
+	<http:request-config
+		name="httpRequestConfiguration"
+		basePath="/api/${api.majorVersion}">
+		<http:request-connection
+			host="${http.host}"
+			port="${http.port}" />
+	</http:request-config>
 </mule>
