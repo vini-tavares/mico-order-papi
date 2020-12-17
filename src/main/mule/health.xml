@@ -16,10 +16,28 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Payload" doc:id="af20916a-114c-4610-b20c-e13fec7148fe" message="#[payload]" />
 	</flow>
 	<flow name="healthReadyFlow" doc:id="4a450995-6c69-49f8-b1bd-4fb97064b832" >
-		<mico-customer-system-api:ready-health-endpoint doc:name="READY Health Endpoint" doc:id="3cabfbfa-37d6-4953-8104-54d579f07866" config-ref="Mico_Customer_System_API_Config"/>
-		<logger level="INFO" doc:name="Logger" doc:id="f79f8370-ef59-4259-9046-113a69b0514b" />
+		<try doc:name="Try" doc:id="0c40717f-9121-4393-8beb-cc5b955048e1" >
+			<mico-customer-system-api:ready-health-endpoint doc:name="READY Health Endpoint" doc:id="3cabfbfa-37d6-4953-8104-54d579f07866" config-ref="Mico_Customer_System_API_Config" />
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2d2407fc-d0ef-4ef2-bc5f-022c2a462096" >
+					<ee:transform doc:name="Transform Message" doc:id="f95abe53-736a-41d9-8fca-e5af2eb28c64" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorMessage": "API is not READY!",
+	"description": error.description
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</on-error-propagate>
+			</error-handler>
+		</try>
 	</flow>
 </mule>
