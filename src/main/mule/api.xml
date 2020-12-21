@@ -22,7 +22,7 @@
 output application/json
 ---
 {
-	"errorMessage": "Bad request",
+	"errorMessage": "Bad request!",
 	"description": error.description
 }]]></ee:set-payload>
 					</ee:message>

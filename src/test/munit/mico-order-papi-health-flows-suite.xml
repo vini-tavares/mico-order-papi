@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+
+
+	<munit:config name="mico-order-papi-health-flows-suite.xml" />
+
+
+
+<munit:test
+		name="get:\alive-200-test"
+		description="Verifying functionality of [get:\alive:mico-order-papi-config-200-application\json]">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="mico-order-papi-main" />
+			<munit:enable-flow-source value="get:\alive:mico-order-papi-config" />
+		</munit:enable-flow-sources>
+		<munit:execution>
+			<http:request
+				method="GET"
+				path="/alive"
+				config-ref="httpRequestConfiguration">
+				<http:headers><![CDATA[#[{"Accept":"application/json"}]]]></http:headers>
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that
+				expression="#[attributes.statusCode]"
+				is="#[MunitTools::equalTo(200)]"
+				message="The HTTP Status code is not correct!"
+				doc:name="Assert That Status Code is 200" />
+			<munit-tools:assert-that doc:name="Assert That - Payload is Expected" doc:id="c31262ae-fe31-43ca-90f9-fc4c11c758d9" message="The response payload is not correct!" expression="#[output application/json --- payload]" is="#[MunitTools::equalTo(readUrl('classpath://scaffolder/response/get_200_alive_application_json.json', 'application/json'))]" />
+		</munit:validation>
+	</munit:test>
+	
+	
+
+	<munit:test
+		name="get:\ready-200-test"
+		description="Verifying functionality of [get:\ready:mico-order-papi-config-200-application\json]">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="mico-order-papi-main" />
+			<munit:enable-flow-source value="get:\ready:mico-order-papi-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when
+				doc:name="Mock mico-customer-system-api:ready-health-endpoint"
+				doc:id="c49ecce0-a510-4051-a86a-ce05934a004c"
+				processor="mico-customer-system-api:ready-health-endpoint">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute
+						whereValue="READY Health Endpoint"
+						attributeName="doc:name" />
+					<munit-tools:with-attribute
+						whereValue="3cabfbfa-37d6-4953-8104-54d579f07866"
+						attributeName="doc:id" />
+					<munit-tools:with-attribute
+						whereValue="Mico_Customer_System_API_Config"
+						attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload
+						value='#[%dw 2.0
+output application/json
+---
+{
+"status":"READY"
+}
+]'
+						mediaType="application/json"
+						encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request
+				method="GET"
+				path="/ready"
+				config-ref="httpRequestConfiguration">
+				<http:headers><![CDATA[#[{"Accept":"application/json"}]]]></http:headers>
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that
+				expression="#[attributes.statusCode]"
+				is="#[MunitTools::equalTo(200)]"
+				message="The HTTP Status code is not correct!"
+				doc:name="Assert That Status Code is 200" />
+			<munit-tools:assert-that
+				doc:name="Assert That - Payload is Expected"
+				doc:id="46480b5c-9028-4336-b2e9-6c08f3edcc37"
+				message="The response payload is not correct!"
+				expression="#[output application/json --- payload]"
+				is="#[MunitTools::equalTo(readUrl('classpath://scaffolder/response/get_200_ready_application_json.json', 'application/json'))]" />
+		</munit:validation>
+	</munit:test>
+	
+	
+	
+	<munit:test
+		name="get:\ready-500-test"
+		description="Verifying functionality of [get:\ready:mico-order-papi-config-200-application\json]">
+		<munit:enable-flow-sources>
+			<munit:enable-flow-source value="mico-order-papi-main" />
+			<munit:enable-flow-source value="get:\ready:mico-order-papi-config" />
+		</munit:enable-flow-sources>
+		<munit:behavior>
+			<munit-tools:mock-when
+				doc:name="Mock mico-customer-system-api:ready-health-endpoint"
+				doc:id="99af21bd-0862-4d77-b154-3497778dd1d0"
+				processor="mico-customer-system-api:ready-health-endpoint">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute
+						whereValue="READY Health Endpoint"
+						attributeName="doc:name" />
+					<munit-tools:with-attribute
+						whereValue="3cabfbfa-37d6-4953-8104-54d579f07866"
+						attributeName="doc:id" />
+					<munit-tools:with-attribute
+						whereValue="Mico_Customer_System_API_Config"
+						attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload
+						value='#[%dw 2.0
+output application/json
+---
+{
+"errorMessage": "API is not READY!",
+}
+]'
+						mediaType="application/json"
+						encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<http:request
+				method="GET"
+				path="/ready"
+				config-ref="httpRequestConfiguration">
+				<http:headers><![CDATA[#[{"Accept":"application/json"}]]]></http:headers>
+			</http:request>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that
+				expression="#[attributes.statusCode]"
+				is="#[MunitTools::equalTo(200)]"
+				message="The HTTP Status code is not correct!"
+				doc:name="Assert That Status Code is 200" />
+			<munit-tools:assert-that
+				doc:name="Assert That - Payload is Expected"
+				doc:id="cc34554b-cd7e-4f75-bd56-6b83af24c3b3"
+				message="The response payload is not correct!"
+				expression="#[output application/json --- payload.errorMessage]"
+				is='#[MunitTools::equalTo("API is not READY!")]' />
+		</munit:validation>
+	</munit:test>
+
+
+
+</mule>

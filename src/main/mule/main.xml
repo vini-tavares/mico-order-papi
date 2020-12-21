@@ -18,20 +18,20 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<try doc:name="Try" doc:id="1231193a-6dde-4c0f-8f01-36c285035519" >
 			<mico-customer-system-api:get-customers doc:name="Get customers from Mico Customer SAPI" doc:id="e5336e9d-abda-4e1b-b6b7-9404ad62592a" config-ref="Mico_Customer_System_API_Config" initial-id="#[attributes.queryParams.'initialId']" final-id="#[attributes.queryParams.'finalId']">
 		</mico-customer-system-api:get-customers>
-			<error-handler >
-				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3b2bf1f0-fe21-405b-9828-df6bcef73933" type="ANY">
-				<ee:transform doc:name="Transform Message" doc:id="c1cd08db-dca8-46a5-8f66-5f3ca9cbcfd3">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+			<error-handler>
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7246eedf-12b0-4cff-a266-a545f29bac4e" type="ANY" >
+					<ee:transform doc:name="Transform Message" doc:id="7ab593b6-9d75-4798-ac66-0bf6e8ba13c7" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 error.errorMessage.payload]]></ee:set-payload>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-			</on-error-propagate>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="httpStatus" ><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</on-error-propagate>
 			</error-handler>
 		</try>
 	</flow>
@@ -60,9 +60,6 @@ error.errorMessage.payload]]></ee:set-payload>
 		doc:id="f75a1266-3b24-4854-ad2d-3bba84a29612">
 		<try doc:name="Try" doc:id="56b2b961-06ee-49d0-ac6e-a13c9dfe37c0" >
 			<mico-order-system-api:get-orders doc:name="Get orders from Mico Order SAPI" doc:id="f6c9e3e6-d215-42c7-b1b3-afe1631a0ffb" config-ref="Mico_Order_System_API_Config" initial-id="#[attributes.queryParams.'initialId' as Number]" final-id="#[attributes.queryParams.'finalId' as Number]">
-			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:INTERNAL_SERVER_ERROR" targetType="APP:INTERNAL_SERVER_ERROR" />
-			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:BAD_REQUEST" targetType="APP:BAD_REQUEST" />
-			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:NOT_FOUND" targetType="APP:ORDER_NOT_FOUND" />
 		</mico-order-system-api:get-orders>
 			<error-handler >
 				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="16bbd401-b332-4b11-9b7b-5c0d2aea6586" type="ANY">
@@ -129,9 +126,6 @@ error.errorMessage.payload]]></ee:set-payload>
 		</try>
 		<try doc:name="Try" doc:id="b5c165fb-6434-42fc-9eeb-671a28154f1e" >
 			<mico-order-system-api:post-order doc:name="Post order by calling Mico Order SAPI" doc:id="b9b779fa-3717-44b1-937b-10121713c187" config-ref="Mico_Order_System_API_Config" target="order" targetValue="#[message]">
-			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:INTERNAL_SERVER_ERROR" targetType="APP:INTERNAL_SERVER_ERROR" />
-			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:BAD_REQUEST" targetType="APP:BAD_REQUEST" />
-			<error-mapping sourceType="MICO-ORDER-SYSTEM-API:NOT_FOUND" targetType="APP:ORDER_NOT_FOUND" />
 			<mico-order-system-api:post-order-request-data><![CDATA[#[%dw 2.0
 output application/json
 ---
@@ -180,14 +174,9 @@ output application/json
 			</ee:message>
 			<ee:variables >
 				<ee:set-variable variableName="outboundHeaders" ><![CDATA[{
-	"Location": vars.customer.attributes.headers.location as String ++ "         " ++ vars.order.attributes.headers.location as String
+	"Location": vars.customer.attributes.headers.Location as String ++ "         " ++ vars.order.attributes.headers.Location as String
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<logger
-			level="INFO"
-			doc:name="Payload"
-			doc:id="0bbfc29e-c697-4f76-812b-324a227b59e9"
-			message="#[payload]" />
 	</flow>
 </mule>
