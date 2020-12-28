@@ -30,8 +30,8 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
 				doc:name="Get customers from Mico Customer SAPI"
 				doc:id="e5336e9d-abda-4e1b-b6b7-9404ad62592a"
 				config-ref="Mico_Customer_System_API_Config"
-				first-name="#[message.attributes.uriParams.'firstName']"
-				last-name="#[message.attributes.uriParams.'lastName']">
+				first-name="#[message.attributes.queryParams.'firstName']"
+				last-name="#[message.attributes.queryParams.'lastName']">
 			</mico-customer-system-api:get-customers>
 			<error-handler>
 				<on-error-propagate
@@ -105,8 +105,8 @@ error.errorMessage.payload]]></ee:set-payload>
 				doc:name="Get orders from Mico Order SAPI"
 				doc:id="f6c9e3e6-d215-42c7-b1b3-afe1631a0ffb"
 				config-ref="Mico_Order_System_API_Config"
-				initial-subtotal="#[message.attributes.uriParams.'initialSubtotal']"
-				final-subtotal="#[message.attributes.uriParams.'finalSubtotal']">
+				initial-subtotal="#[message.attributes.queryParams.'initialSubtotal']"
+				final-subtotal="#[message.attributes.queryParams.'finalSubtotal']">
 			</mico-order-system-api:get-orders>
 			<error-handler>
 				<on-error-propagate
@@ -183,12 +183,13 @@ error.errorMessage.payload]]></ee:set-payload>
 	   AND Last_Name__c=':lastName' AND Email__c=':email' AND 
 	   Phone_Number__c=':phoneNumber']]></salesforce:salesforce-query>
 			<salesforce:parameters><![CDATA[#[{
-	firstName: message.payload.firstName,
-	lastName: message.payload.lastName,
-	email: message.payload.email,
-	phoneNumber: message.payload.phoneNumber
+	firstName: message.payload.customer.firstName,
+	lastName: message.payload.customer.lastName,
+	email: message.payload.customer.email,
+	phoneNumber: message.payload.customer.phoneNumber
 }]]]></salesforce:parameters>
 		</salesforce:query>
+		<logger level="INFO" doc:name="Logger" doc:id="54842461-88a4-49f9-a27e-bd551ee5b8b5" message="#[%dw 2.0 output application/json --- vars.customerCheck]"/>
 		<choice
 			doc:name="Choice"
 			doc:id="bb75a870-3ad6-4c30-9584-2898851d89a0">
@@ -322,7 +323,7 @@ output application/json
         	"giftWrapMessage": message.payload.'orderData'.giftWrapMessage,
         	"currencyCode": message.payload.'orderData'.currencyCode,
         	"subTotal": message.payload.'orderData'.subTotal,
-        	"customerSalesforceId": vars.customerCheck.Id
+        	"customerSalesforceId": vars.customerCheck[0].Id
 		},
 	"items": message.payload.'items'
 }]]]></mico-order-system-api:post-order-request-data>
@@ -359,12 +360,12 @@ output application/json
 ---
 {
 	"orderSalesforceId": vars.order.payload.salesforceId,
-	"customerSalesforceId": vars.customerCheck.Id
+	"customerSalesforceId": vars.customerCheck[0].Id
 }]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
 						<ee:set-variable variableName="outboundHeaders"><![CDATA[{
-	"Location": vars.customer.attributes.headers.Location as String ++ "         " ++ vars.order.attributes.headers.Location as String
+	"Location": "/customers/" ++ vars.customerCheck[0].Id as String ++ "         " ++ vars.order.attributes.headers.Location as String
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
