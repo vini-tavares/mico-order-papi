@@ -21,7 +21,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 
 <munit:test
 		name="get:\alive-200-test"
-		description="Verifying functionality of [get:\alive:mico-order-papi-config-200-application\json]">
+		description="Verifying functionality of [get:\alive:mico-order-papi-config-200-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
 			<munit:enable-flow-source value="get:\alive:mico-order-papi-config" />
@@ -48,7 +48,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 
 	<munit:test
 		name="get:\ready-200-test"
-		description="Verifying functionality of [get:\ready:mico-order-papi-config-200-application\json]">
+		description="Verifying functionality of [get:\ready:mico-order-papi-config-200-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
 			<munit:enable-flow-source value="get:\ready:mico-order-papi-config" />
@@ -110,7 +110,7 @@ output application/json
 	
 	<munit:test
 		name="get:\ready-500-test"
-		description="Verifying functionality of [get:\ready:mico-order-papi-config-200-application\json]">
+		description="Verifying functionality of [get:\ready:mico-order-papi-config-200-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
 			<munit:enable-flow-source value="get:\ready:mico-order-papi-config" />

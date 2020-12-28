@@ -20,7 +20,7 @@
 		<!-- Mico Order PAPI - Connector -->
 		<api.groupId>cd8b296d-8848-4a91-98ed-4a47f73703bd</api.groupId>
 		<api.artifactId>mico-order-papi</api.artifactId>
-		<api.version>1.0.8</api.version>
+		<api.version>1.0.9</api.version>
 		<munit.version>2.3.1</munit.version>
 	</properties>
 
@@ -132,18 +132,6 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
     	<dependency>
-            <groupId>cd8b296d-8848-4a91-98ed-4a47f73703bd</groupId>
-            <artifactId>mule-plugin-composite-order-sapi</artifactId>
-            <version>1.0.7</version>
-            <classifier>mule-plugin</classifier>
-        </dependency>
-    	<dependency>
-            <groupId>cd8b296d-8848-4a91-98ed-4a47f73703bd</groupId>
-            <artifactId>mule-plugin-mico-customer-sapi</artifactId>
-            <version>1.0.8</version>
-            <classifier>mule-plugin</classifier>
-        </dependency>
-    	<dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-sockets-connector</artifactId>
             <version>1.2.0</version>
@@ -153,6 +141,24 @@
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
             <version>1.5.23</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    	<dependency>
+            <groupId>cd8b296d-8848-4a91-98ed-4a47f73703bd</groupId>
+            <artifactId>mule-plugin-mico-customer-sapi</artifactId>
+            <version>1.0.10</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    	<dependency>
+            <groupId>cd8b296d-8848-4a91-98ed-4a47f73703bd</groupId>
+            <artifactId>mule-plugin-composite-order-sapi</artifactId>
+            <version>1.0.9</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+    	<dependency>
+            <groupId>com.mulesoft.connectors</groupId>
+            <artifactId>mule-salesforce-connector</artifactId>
+            <version>10.6.0</version>
             <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>
