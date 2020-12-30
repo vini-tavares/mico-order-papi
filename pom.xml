@@ -20,7 +20,7 @@
 		<!-- Mico Order PAPI - Connector -->
 		<api.groupId>cd8b296d-8848-4a91-98ed-4a47f73703bd</api.groupId>
 		<api.artifactId>mico-order-papi</api.artifactId>
-		<api.version>1.0.10</api.version>
+		<api.version>1.0.11</api.version>
 		<munit.version>2.3.1</munit.version>
 	</properties>
 
@@ -125,12 +125,6 @@
 			<version>1.4.2</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
-		<dependency>
-			<groupId>com.mulesoft.modules</groupId>
-			<artifactId>mule-secure-configuration-property-module</artifactId>
-			<version>1.2.3</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
     	<dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-sockets-connector</artifactId>
@@ -144,12 +138,6 @@
             <classifier>mule-plugin</classifier>
         </dependency>
     	<dependency>
-            <groupId>com.mulesoft.connectors</groupId>
-            <artifactId>mule-salesforce-connector</artifactId>
-            <version>10.6.0</version>
-            <classifier>mule-plugin</classifier>
-        </dependency>
-    	<dependency>
             <groupId>cd8b296d-8848-4a91-98ed-4a47f73703bd</groupId>
             <artifactId>mule-plugin-mico-customer-sapi</artifactId>
             <version>1.0.11</version>
@@ -158,7 +146,7 @@
     	<dependency>
             <groupId>cd8b296d-8848-4a91-98ed-4a47f73703bd</groupId>
             <artifactId>mule-plugin-composite-order-sapi</artifactId>
-            <version>1.0.11</version>
+            <version>1.0.13</version>
             <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>

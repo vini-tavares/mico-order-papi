@@ -63,7 +63,11 @@ error.errorMessage.payload]]></ee:set-payload>
 		<try
 			doc:name="Try"
 			doc:id="56d80fe8-dc68-4ba5-ac94-2714fa007ac7">
-			<mico-customer-system-api:get-customer-by-email doc:name="Get customer by email" doc:id="3e7b0f43-1cba-4f18-a6cd-54e9c387ee0b" config-ref="Mico_Customer_System_API_Config" email="#[message.attributes.queryParams.'email']"/>
+			<mico-customer-system-api:get-customer-by-email
+				doc:name="Get customer by email"
+				doc:id="3e7b0f43-1cba-4f18-a6cd-54e9c387ee0b"
+				config-ref="Mico_Customer_System_API_Config"
+				email="#[message.attributes.queryParams.'email']" />
 			<error-handler>
 				<on-error-propagate
 					enableNotifications="true"
@@ -134,11 +138,7 @@ error.errorMessage.payload]]></ee:set-payload>
 		<try
 			doc:name="Try"
 			doc:id="cc8a458c-24fb-497d-bad2-19f29f375cc2">
-			<mico-order-system-api:get-order-by-id
-				doc:name="Get order by Id"
-				doc:id="0933dc35-3e14-417a-9428-b8feaa052943"
-				config-ref="Mico_Order_System_API_Config"
-				salesforce-id="#[message.attributes.uriParams.'poNumber']" />
+			<mico-order-system-api:get-order-by-ponumber doc:name="Get order by poNumber" doc:id="07ef9d35-3284-4956-b246-7478464e267b" config-ref="Mico_Order_System_API_Config" po-number="#[message.attributes.uriParams.'poNumber']"/>
 			<error-handler>
 				<on-error-propagate
 					enableNotifications="true"
@@ -169,35 +169,26 @@ error.errorMessage.payload]]></ee:set-payload>
 	<flow
 		name="postOrdersFlow"
 		doc:id="e7fbb6e6-43f3-4ab3-bd4c-65453a658ed6">
-		<mico-customer-system-api:get-customer-by-email doc:name="Get customer by email" doc:id="22bc6ab0-5396-474f-bdbe-d6099fb0af0b" config-ref="Mico_Customer_System_API_Config" email="#[payload.customer.'Email']" target="customerCheck"/>
+		<try doc:name="Try" doc:id="b2634eaf-7414-4d49-830d-5c02d3ecf3f2" >
+			<mico-customer-system-api:get-customer-by-email doc:name="Get customer by email" doc:id="22bc6ab0-5396-474f-bdbe-d6099fb0af0b" config-ref="Mico_Customer_System_API_Config" email="#[payload.customer.email]" target="customerCheck" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="14494b0d-fbce-4233-9c71-7510501e685d" type="MICO-CUSTOMER-SYSTEM-API:NOT_FOUND"/>
+			</error-handler>
+		</try>
 		<choice
 			doc:name="Choice"
 			doc:id="bb75a870-3ad6-4c30-9584-2898851d89a0">
-			<when expression='#[vars.customerCheck.errorMessage == "Customer not found!"]'>
-				<try
-					doc:name="Try"
-					doc:id="b5c45dad-97e7-4085-869f-58fbf629a98d">
-					<mico-customer-system-api:post-customer
-						doc:name="Post customer by calling Mico Customer SAPI"
-						doc:id="b7a837fb-fba0-4149-b6d5-824377adc2d7"
-						config-ref="Mico_Customer_System_API_Config"
-						target="customer"
-						targetValue="#[message]">
+			<when expression="#[vars.customerCheck == null]">
+				<try doc:name="Try" doc:id="8e5d924b-efed-441e-9a75-0ceedc81f2f5">
+					<mico-customer-system-api:post-customer doc:name="Post customer by calling Mico Customer SAPI" doc:id="5bd2bee2-17bb-4982-b257-bfbbc1fce2af" config-ref="Mico_Customer_System_API_Config" target="customer" targetValue="#[message]">
 						<mico-customer-system-api:post-customer-request-data><![CDATA[#[%dw 2.0
 output application/json
 ---
 payload.customer]]]></mico-customer-system-api:post-customer-request-data>
 					</mico-customer-system-api:post-customer>
 					<error-handler>
-						<on-error-propagate
-							enableNotifications="true"
-							logException="true"
-							doc:name="On Error Propagate"
-							doc:id="2dcda097-e389-4061-825e-ac25f5b99bbf"
-							type="ANY">
-							<ee:transform
-								doc:name="Transform Message"
-								doc:id="f397d4ab-edf4-4094-973a-a05e5606c920">
+						<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="255ab99a-1667-4a6a-bc5c-94bda4df1159" type="ANY">
+							<ee:transform doc:name="Transform Message" doc:id="03c83c9d-1038-4681-90a6-2f00dfe98c96">
 								<ee:message>
 									<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -213,7 +204,7 @@ error.errorMessage.payload]]></ee:set-payload>
 				</try>
 			</when>
 		</choice>
-		<try doc:name="Try" doc:id="0a1b1949-160a-4986-9caf-c1c21223d193">
+		<try doc:name="Try" doc:id="7081d5eb-5464-4af6-8aa2-43574a982971">
 					<mico-order-system-api:post-order doc:name="Post order by calling Mico Order SAPI" doc:id="c303e14c-0093-4d16-b448-7e96bee25af4" config-ref="Mico_Order_System_API_Config" target="order" targetValue="#[message]">
 						<mico-order-system-api:post-order-request-data><![CDATA[#[%dw 2.0
 output application/json
@@ -228,7 +219,7 @@ output application/json
         	"giftWrapMessage": message.payload.'orderData'.giftWrapMessage,
         	"currencyCode": message.payload.'orderData'.currencyCode,
         	"subTotal": message.payload.'orderData'.subTotal,
-        	"customerSalesforceId": vars.customerCheck[0].Id default vars.customer.payload.salesforceId
+        	"customerSalesforceId": vars.customerCheck.'salesforceId' default vars.customer.payload.'salesforceId'
 		},
 	"items": message.payload.'items'
 }]]]></mico-order-system-api:post-order-request-data>
@@ -256,12 +247,15 @@ output application/json
 ---
 {
 	"orderSalesforceId": vars.order.payload.salesforceId,
-	"customerSalesforceId": vars.customerCheck[0].Id default vars.customer.payload.salesforceId
+	"customerSalesforceId": vars.customerCheck.salesforceId default vars.customer.payload.salesforceId
 }]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="outboundHeaders"><![CDATA[{
-	"Location": "/customers/" ++ vars.customerCheck[0].Id as String ++ "         " ++ vars.order.attributes.headers.Location as String
+						<ee:set-variable variableName="outboundHeaders"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Location": "/customers/" ++ vars.customerCheck.email as String default payload.email as String ++ "         " ++ vars.order.attributes.headers.Location as String
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
