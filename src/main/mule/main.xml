@@ -58,16 +58,12 @@ error.errorMessage.payload]]></ee:set-payload>
 		</try>
 	</flow>
 	<flow
-		name="getCustomerByIdFlow"
+		name="getCustomerByEmailFlow"
 		doc:id="900a9430-a09f-4cb0-9a42-6716593b5de9">
 		<try
 			doc:name="Try"
 			doc:id="56d80fe8-dc68-4ba5-ac94-2714fa007ac7">
-			<mico-customer-system-api:get-customer-by-id
-				doc:name="Get customer by Id"
-				doc:id="624f198d-2552-4822-9e04-e3e5981a6e94"
-				config-ref="Mico_Customer_System_API_Config"
-				salesforce-id="#[message.attributes.uriParams.salesforceId]" />
+			<mico-customer-system-api:get-customer-by-email doc:name="Get customer by email" doc:id="3e7b0f43-1cba-4f18-a6cd-54e9c387ee0b" config-ref="Mico_Customer_System_API_Config" email="#[message.attributes.queryParams.'email']"/>
 			<error-handler>
 				<on-error-propagate
 					enableNotifications="true"
@@ -133,7 +129,7 @@ error.errorMessage.payload]]></ee:set-payload>
 		</try>
 	</flow>
 	<flow
-		name="getOrderByIdFlow"
+		name="getOrderByPoNumberFlow"
 		doc:id="e7d3ded9-4938-4d90-b1ba-8473ff1df6c3">
 		<try
 			doc:name="Try"
@@ -142,7 +138,7 @@ error.errorMessage.payload]]></ee:set-payload>
 				doc:name="Get order by Id"
 				doc:id="0933dc35-3e14-417a-9428-b8feaa052943"
 				config-ref="Mico_Order_System_API_Config"
-				salesforce-id="#[message.attributes.uriParams.salesforceId]" />
+				salesforce-id="#[message.attributes.uriParams.'poNumber']" />
 			<error-handler>
 				<on-error-propagate
 					enableNotifications="true"
@@ -173,27 +169,11 @@ error.errorMessage.payload]]></ee:set-payload>
 	<flow
 		name="postOrdersFlow"
 		doc:id="e7fbb6e6-43f3-4ab3-bd4c-65453a658ed6">
-		<salesforce:query
-			doc:name="Get Customer to check if it exists"
-			doc:id="36f5d469-f3cc-47c4-8240-8b0d5e8c488c"
-			config-ref="salesforceConfig"
-			target="customerCheck">
-			<salesforce:salesforce-query><![CDATA[SELECT Id,CustomerId__c,First_Name__c,Last_Name__c,Phone_Number__c,Email__c,
-	   Address__c FROM Customer__c WHERE First_Name__c=':firstName' 
-	   AND Last_Name__c=':lastName' AND Email__c=':email' AND 
-	   Phone_Number__c=':phoneNumber']]></salesforce:salesforce-query>
-			<salesforce:parameters><![CDATA[#[{
-	firstName: message.payload.customer.firstName,
-	lastName: message.payload.customer.lastName,
-	email: message.payload.customer.email,
-	phoneNumber: message.payload.customer.phoneNumber
-}]]]></salesforce:parameters>
-		</salesforce:query>
-		<logger level="INFO" doc:name="Logger" doc:id="54842461-88a4-49f9-a27e-bd551ee5b8b5" message="#[%dw 2.0 output application/json --- vars.customerCheck]"/>
+		<mico-customer-system-api:get-customer-by-email doc:name="Get customer by email" doc:id="22bc6ab0-5396-474f-bdbe-d6099fb0af0b" config-ref="Mico_Customer_System_API_Config" email="#[payload.customer.'Email']" target="customerCheck"/>
 		<choice
 			doc:name="Choice"
 			doc:id="bb75a870-3ad6-4c30-9584-2898851d89a0">
-			<when expression="#[vars.customerCheck == []]">
+			<when expression='#[vars.customerCheck.errorMessage == "Customer not found!"]'>
 				<try
 					doc:name="Try"
 					doc:id="b5c45dad-97e7-4085-869f-58fbf629a98d">
@@ -231,85 +211,10 @@ error.errorMessage.payload]]></ee:set-payload>
 						</on-error-propagate>
 					</error-handler>
 				</try>
-				<try
-					doc:name="Try"
-					doc:id="b5c165fb-6434-42fc-9eeb-671a28154f1e">
-					<mico-order-system-api:post-order
-						doc:name="Post order by calling Mico Order SAPI"
-						doc:id="b9b779fa-3717-44b1-937b-10121713c187"
-						config-ref="Mico_Order_System_API_Config"
-						target="order"
-						targetValue="#[message]">
-						<mico-order-system-api:post-order-request-data><![CDATA[#[%dw 2.0
-output application/json
----
-{
-	"orderData": 
-		{	
-			"poNumber": message.payload.'orderData'.poNumber,
-        	"signatureRequiredFlag": message.payload.'orderData'.signatureRequiredFlag,
-        	"shipInstructions": message.payload.'orderData'.shipInstructions,
-        	"giftWrapFlag": message.payload.'orderData'.giftWrapFlag,
-        	"giftWrapMessage": message.payload.'orderData'.giftWrapMessage,
-        	"currencyCode": message.payload.'orderData'.currencyCode,
-        	"subTotal": message.payload.'orderData'.subTotal,
-        	"customerSalesforceId": vars.customer.payload.salesforceId
-		},
-	"items": message.payload.'items'
-}]]]></mico-order-system-api:post-order-request-data>
-					</mico-order-system-api:post-order>
-					<error-handler>
-						<on-error-propagate
-							enableNotifications="true"
-							logException="true"
-							doc:name="On Error Propagate"
-							doc:id="c0354185-70ee-4ec0-93bb-d94cce7eea99"
-							type="ANY">
-							<ee:transform
-								doc:name="Transform Message"
-								doc:id="afecb392-703b-424c-bcc0-f0acdc69356c">
-								<ee:message>
-									<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-error.errorMessage.payload]]></ee:set-payload>
-								</ee:message>
-								<ee:variables>
-									<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
-								</ee:variables>
-							</ee:transform>
-						</on-error-propagate>
-					</error-handler>
-				</try>
-				<ee:transform
-					doc:name="Transform to JSON Object"
-					doc:id="9984a573-82dd-4323-8eb6-6e71131a7662">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"orderSalesforceId": vars.order.payload.salesforceId,
-	"customerSalesforceId": vars.customer.payload.salesforceId
-}]]></ee:set-payload>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="outboundHeaders"><![CDATA[{
-	"Location": vars.customer.attributes.headers.Location as String ++ "         " ++ vars.order.attributes.headers.Location as String
-}]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
 			</when>
-			<otherwise>
-				<try
-					doc:name="Try"
-					doc:id="0a1b1949-160a-4986-9caf-c1c21223d193">
-					<mico-order-system-api:post-order
-						doc:name="Post order by calling Mico Order SAPI"
-						doc:id="c303e14c-0093-4d16-b448-7e96bee25af4"
-						config-ref="Mico_Order_System_API_Config"
-						target="order"
-						targetValue="#[message]">
+		</choice>
+		<try doc:name="Try" doc:id="0a1b1949-160a-4986-9caf-c1c21223d193">
+					<mico-order-system-api:post-order doc:name="Post order by calling Mico Order SAPI" doc:id="c303e14c-0093-4d16-b448-7e96bee25af4" config-ref="Mico_Order_System_API_Config" target="order" targetValue="#[message]">
 						<mico-order-system-api:post-order-request-data><![CDATA[#[%dw 2.0
 output application/json
 ---
@@ -323,21 +228,14 @@ output application/json
         	"giftWrapMessage": message.payload.'orderData'.giftWrapMessage,
         	"currencyCode": message.payload.'orderData'.currencyCode,
         	"subTotal": message.payload.'orderData'.subTotal,
-        	"customerSalesforceId": vars.customerCheck[0].Id
+        	"customerSalesforceId": vars.customerCheck[0].Id default vars.customer.payload.salesforceId
 		},
 	"items": message.payload.'items'
 }]]]></mico-order-system-api:post-order-request-data>
 					</mico-order-system-api:post-order>
 					<error-handler>
-						<on-error-propagate
-							enableNotifications="true"
-							logException="true"
-							doc:name="On Error Propagate"
-							doc:id="286c74b0-9189-44e9-9b6a-599d9d6a0261"
-							type="ANY">
-							<ee:transform
-								doc:name="Transform Message"
-								doc:id="6781f0e3-bc9d-4c90-8343-bf544ac6a96e">
+						<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="286c74b0-9189-44e9-9b6a-599d9d6a0261" type="ANY">
+							<ee:transform doc:name="Transform Message" doc:id="6781f0e3-bc9d-4c90-8343-bf544ac6a96e">
 								<ee:message>
 									<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -351,16 +249,14 @@ error.errorMessage.payload]]></ee:set-payload>
 						</on-error-propagate>
 					</error-handler>
 				</try>
-				<ee:transform
-					doc:name="Transform to JSON Object"
-					doc:id="aa7f052f-56c9-45d2-8e73-203a074181ca">
+		<ee:transform doc:name="Transform to JSON Object" doc:id="aa7f052f-56c9-45d2-8e73-203a074181ca">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
 	"orderSalesforceId": vars.order.payload.salesforceId,
-	"customerSalesforceId": vars.customerCheck[0].Id
+	"customerSalesforceId": vars.customerCheck[0].Id default vars.customer.payload.salesforceId
 }]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
@@ -369,7 +265,5 @@ output application/json
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-			</otherwise>
-		</choice>
 	</flow>
 </mule>

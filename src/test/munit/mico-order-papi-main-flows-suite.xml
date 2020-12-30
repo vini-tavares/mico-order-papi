@@ -222,11 +222,11 @@ output application/json
 
 
 	<munit:test
-		name="get:\customers\(salesforceId)-200-test"
+		name="get:\customers\(email)-200-test"
 		description="Verifying functionality of [get:\customers\(salesforceId):mico-order-papi-config-200-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
-			<munit:enable-flow-source value="get:\customers\(salesforceId):mico-order-papi-config" />
+			<munit:enable-flow-source value="get:\customers\(email):mico-order-papi-config" />
 		</munit:enable-flow-sources>
 		<munit:behavior>
 			<set-variable
@@ -269,11 +269,11 @@ output application/json
 
 
 	<munit:test
-		name="get:\customers\(salesforceId)-404-test"
+		name="get:\customers\(email)-404-test"
 		description="Verifying functionality of [get:\customers\(salesforceId):mico-order-papi-config-404-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
-			<munit:enable-flow-source value="get:\customers\(salesforceId):mico-order-papi-config" />
+			<munit:enable-flow-source value="get:\customers\(email):mico-order-papi-config" />
 		</munit:enable-flow-sources>
 		<munit:behavior>
 			<set-variable
@@ -313,11 +313,11 @@ output application/json
 
 
 	<munit:test
-		name="get:\customers\(salesforceId)-400-test"
+		name="get:\customers\(email)-400-test"
 		description="Verifying functionality of [get:\customers\(salesforceId):mico-order-papi-config-400-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
-			<munit:enable-flow-source value="get:\customers\(salesforceId):mico-order-papi-config" />
+			<munit:enable-flow-source value="get:\customers\(email):mico-order-papi-config" />
 		</munit:enable-flow-sources>
 		<munit:behavior>
 			<set-variable
@@ -358,11 +358,11 @@ output application/json
 
 
 	<munit:test
-		name="get:\customers\(salesforceId)-500-test"
+		name="get:\customers\(email)-500-test"
 		description="Verifying functionality of [get:\customers\(salesforceId):mico-order-papi-config-500-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
-			<munit:enable-flow-source value="get:\customers\(salesforceId):mico-order-papi-config" />
+			<munit:enable-flow-source value="get:\customers\(email):mico-order-papi-config" />
 		</munit:enable-flow-sources>
 		<munit:behavior>
 			<set-variable
@@ -560,11 +560,11 @@ output application/json
 
 
 	<munit:test
-		name="get:\orders\(salesforceId)-200-test"
+		name="get:\orders\(poNumber)-200-test"
 		description="Verifying functionality of [get:\orders\(salesforceId):mico-order-papi-config-200-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
-			<munit:enable-flow-source value="get:\orders\(salesforceId):mico-order-papi-config" />
+			<munit:enable-flow-source value="get:\orders\(poNumber):mico-order-papi-config" />
 		</munit:enable-flow-sources>
 		<munit:behavior>
 			<set-variable
@@ -607,11 +607,11 @@ output application/json
 
 
 	<munit:test
-		name="get:\orders\(salesforceId)-404-test"
+		name="get:\orders\(poNumber)-404-test"
 		description="Verifying functionality of [get:\orders\(salesforceId):mico-order-papi-config-404-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
-			<munit:enable-flow-source value="get:\orders\(salesforceId):mico-order-papi-config" />
+			<munit:enable-flow-source value="get:\orders\(poNumber):mico-order-papi-config" />
 		</munit:enable-flow-sources>
 		<munit:behavior>
 			<set-variable
@@ -651,11 +651,11 @@ output application/json
 
 
 	<munit:test
-		name="get:\orders\(salesforceId)-400-test"
+		name="get:\orders\(poNumber)-400-test"
 		description="Verifying functionality of [get:\orders\(salesforceId):mico-order-papi-config-400-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
-			<munit:enable-flow-source value="get:\orders\(salesforceId):mico-order-papi-config" />
+			<munit:enable-flow-source value="get:\orders\(poNumber):mico-order-papi-config" />
 		</munit:enable-flow-sources>
 		<munit:behavior>
 			<set-variable
@@ -696,11 +696,11 @@ output application/json
 
 
 	<munit:test
-		name="get:\orders\(salesforceId)-500-test"
+		name="get:\orders\(poNumber)-500-test"
 		description="Verifying functionality of [get:\orders\(salesforceId):mico-order-papi-config-500-application\json]" ignore="true">
 		<munit:enable-flow-sources>
 			<munit:enable-flow-source value="mico-order-papi-main" />
-			<munit:enable-flow-source value="get:\orders\(salesforceId):mico-order-papi-config" />
+			<munit:enable-flow-source value="get:\orders\(poNumber):mico-order-papi-config" />
 		</munit:enable-flow-sources>
 		<munit:behavior>
 			<set-variable

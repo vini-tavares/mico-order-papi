@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
@@ -162,13 +162,10 @@ output application/json
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{
-	"errorMessage": "Resource not found",
-	"description": error.description
-}]]></ee:set-payload>
+{message: "Resource not found"}]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+						<ee:set-variable variableName="httpStatus">404</ee:set-variable>
 					</ee:variables>
 				</ee:transform>
 			</on-error-propagate>
@@ -180,7 +177,7 @@ output application/json
 	<flow name="get:\alive:mico-order-papi-config">
 		<flow-ref
 			doc:name="healthAliveFlow"
-			doc:id="988633c9-2efe-46f3-b924-4a6829b99a72"
+			doc:id="2b3ad6d3-4a4f-47a5-b677-43a25d412b91"
 			name="healthAliveFlow" />
 	</flow>
 
@@ -189,7 +186,7 @@ output application/json
 	<flow name="get:\customers:mico-order-papi-config">
 		<flow-ref
 			doc:name="getCustomersFlow"
-			doc:id="3044c725-0dec-484d-b038-4c8f02e57ba4"
+			doc:id="954adc5c-2176-4138-ba3a-d7087908028b"
 			name="getCustomersFlow" />
 	</flow>
 
@@ -198,7 +195,7 @@ output application/json
 	<flow name="get:\orders:mico-order-papi-config">
 		<flow-ref
 			doc:name="getOrdersFlow"
-			doc:id="20e28572-a0ac-4723-9b32-7cca888cb6c5"
+			doc:id="2164cff1-7f06-4b65-a3db-894f8bd12950"
 			name="getOrdersFlow" />
 	</flow>
 
@@ -207,26 +204,26 @@ output application/json
 	<flow name="get:\ready:mico-order-papi-config">
 		<flow-ref
 			doc:name="healthReadyFlow"
-			doc:id="81f5870b-2641-489f-a3cc-f968d9819106"
+			doc:id="aca34a8b-682e-4370-b248-7c4f7e78f7ac"
 			name="healthReadyFlow" />
 	</flow>
 
 
 
-	<flow name="get:\customers\(salesforceId):mico-order-papi-config">
+	<flow name="get:\customers\(email):mico-order-papi-config">
 		<flow-ref
-			doc:name="getCustomerByIdFlow"
-			doc:id="7a13c2f1-e9ff-4df1-b15a-fd75f9e1ce5d"
-			name="getCustomerByIdFlow" />
+			doc:name="getCustomerByEmailFlow"
+			doc:id="275ed10d-e600-4609-af02-e26565ed45d6"
+			name="getCustomerByEmailFlow" />
 	</flow>
 
 
 
-	<flow name="get:\orders\(salesforceId):mico-order-papi-config">
+	<flow name="get:\orders\(poNumber):mico-order-papi-config">
 		<flow-ref
-			doc:name="getOrderByIdFlow"
-			doc:id="55c2903b-2af1-414c-a3f3-5729cc60993a"
-			name="getOrderByIdFlow" />
+			doc:name="getOrderByPoNumberFlow"
+			doc:id="f0fe1937-223c-4b69-be82-bf7fdd9c6c9e"
+			name="getOrderByPoNumberFlow" />
 	</flow>
 
 
@@ -234,7 +231,7 @@ output application/json
 	<flow name="post:\orders:application\json:mico-order-papi-config">
 		<flow-ref
 			doc:name="postOrdersFlow"
-			doc:id="fefc83b7-b99a-4ff0-b240-1d698a7cb3de"
+			doc:id="2510e345-87e7-47fc-b841-e7afcb66ac06"
 			name="postOrdersFlow" />
 	</flow>
 

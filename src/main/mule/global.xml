@@ -84,22 +84,6 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
 		doc:name="apiAutodiscovery"
 		doc:id="d3060188-f5d6-4fb6-8fb0-86a54d3df98c"
 		flowRef="mico-order-papi-main" />
-		
-	<salesforce:sfdc-config
-		name="salesforceConfig"
-		doc:name="Salesforce Config"
-		doc:id="fc561463-2971-40f7-892d-005fac443d86">
-		<salesforce:oauth-user-pass-connection
-			consumerKey="${secure::sf.consumerKey}"
-			consumerSecret="${secure::sf.consumerSecret}"
-			username="${secure::sf.username}"
-			password="${secure::sf.password}"
-			securityToken="${secure::sf.securityToken}" />
-	</salesforce:sfdc-config>
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="6edec6c9-c443-4caa-ba88-7050465ef8f1" key="${encrypt.key}" file="properties-${env}-secure.yaml">
-		<secure-properties:encrypt algorithm="Blowfish" />
-	</secure-properties:config>
-	<global-property doc:name="Global Property" doc:id="d890938d-a0e5-443f-ba16-d87437222aca" name="encrypt.key" value="secure12345" />
 	<validation:config name="validationConfig" doc:name="Validation Config" doc:id="22e925d4-3f7c-4b38-892e-d052ec6338f4" />
 		
 </mule>
