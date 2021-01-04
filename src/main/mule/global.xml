@@ -57,18 +57,18 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
 		property_protocol="HTTP"
 		property_client-id="temp"
 		property_client-secret="temp"
-		property_basePath="/api/${api.majorVersion}" />
+		property_basePath="/api/${api.majorVersion}" property_responseTimeout="1000000"/>
 
 	<mico-order-system-api:config
 		name="Mico_Order_System_API_Config"
 		doc:name="Mico Order System API Config"
 		doc:id="5536156b-9758-4656-bec6-f2a2bfa6f559"
-		property_host="mico-order-sapi-dev.us-e2.cloudhub.io"
-		property_port="80"
+		property_host="localhost"
+		property_port="8083"
 		property_protocol="HTTP"
 		property_client-id="temp"
 		property_client-secret="temp"
-		property_basePath="/api/${api.majorVersion}" />
+		property_basePath="/api/${api.majorVersion}" property_responseTimeout="1000000"/>
 
 	<http:request-config
 		name="httpRequestConfiguration"

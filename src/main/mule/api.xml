@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule
+	xmlns:error-handler-plugin="http://www.mulesoft.org/schema/mule/error-handler-plugin"
 	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/error-handler-plugin http://www.mulesoft.org/schema/mule/error-handler-plugin/current/mule-error-handler-plugin.xsd">
 
 
 
@@ -24,116 +26,44 @@
 		</http:listener>
 		<apikit:router config-ref="mico-order-papi-config" />
 		<error-handler>
-			<on-error-propagate
-				type="APIKIT:BAD_REQUEST"
-				enableNotifications="true"
-				logException="true">
-				<ee:transform
-					xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-					xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"errorMessage": "Bad request!",
-	"description": error.description
-}]]></ee:set-payload>
-					</ee:message>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e6b2b980-a5bf-4382-ba83-ee5d67d2b428" type="MICO-CUSTOMER-SYSTEM-API:NOT_FOUND" when="#[error.errorType.namespace == 'MICO-CUSTOMER-SYSTEM-API']">
+				<ee:transform doc:name="Transform Message" doc:id="9bb41956-921a-4224-ab51-4a09ca2fed74">
+					<ee:message />
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+						<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+output application/java
+---
+error.muleMessage.typedValue.errorDetails default []]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
+				<error-handler-plugin:on-error doc:name="Process Error" doc:id="78ef6981-5b77-4c22-a712-85a27848b18d" badRequestError='#[error.description default "There was an issue with your request message."]' unauthorizedError='#[error.description default "You have issues accessing the system"]' notFoundError='#[error.description default "The API has not been implemented"]' notAcceptableError='#[error.description default "One of the request or parameters is unacceptable"]' timeoutError='#[error.description default "You request to the server has been timed-out"]' unsupportedMediaTypeError='#[error.description default "Media Type not supported"]' tooManyRequestsError='#[error.description default "You have made too many requests to the server"]' serverError='#[error.description default "There is a server issue"]' methodNotAllowedError='#[error.description default "The method has not been implemented"]' connectivityError='#[error.description default "You have issues accessing the system"]' errorTypes="MICO-CUSTOMER-SYSTEM-API:NOT_FOUND" errorCodes="404" errorMessages='#[error.detailedDescription default "" replace "," with ""]' />
+				<set-variable value="#[attributes.httpStatus]" doc:name="Set httpStatus" doc:id="1c0941bb-d7be-47ee-a323-d99b9c569f7b" variableName="httpStatus" />
 			</on-error-propagate>
-			<on-error-propagate type="APIKIT:NOT_FOUND">
-				<ee:transform
-					xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-					xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8f9b84eb-e522-4a53-95a9-b9a249cbb901" type="MICO-ORDER-SYSTEM-API:NOT_FOUND" when="#[error.errorType.namespace == 'MICO-ORDER-SYSTEM-API']" >
+				<ee:transform doc:name="Transform Message" doc:id="85a9f65d-73a9-4c2e-a2b9-39e58a03ade9" >
+					<ee:message />
+					<ee:variables >
+						<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+output application/java
 ---
-{
-	"errorMessage": "Resource not found",
-	"description": error.description
-}]]></ee:set-payload>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+error.muleMessage.typedValue.errorDetails default []]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
+				<error-handler-plugin:on-error doc:name="Process Error" doc:id="90e0275a-0f5c-43e5-a644-c6225adf2662" badRequestError='#[error.description default "There was an issue with your request message."]' unauthorizedError='#[error.description default "You have issues accessing the system"]' notFoundError='#[error.description default "The API has not been implemented"]' notAcceptableError='#[error.description default "One of the request or parameters is unacceptable"]' timeoutError='#[error.description default "You request to the server has been timed-out"]' unsupportedMediaTypeError='#[error.description default "Media Type not supported"]' tooManyRequestsError='#[error.description default "You have made too many requests to the server"]' serverError='#[error.description default "There is a server issue"]' methodNotAllowedError='#[error.description default "The method has not been implemented"]' connectivityError='#[error.description default "You have issues accessing the system"]' errorTypes="MICO-ORDER-SYSTEM-API:NOT_FOUND" errorCodes="404" errorMessages='#[error.detailedDescription default "" replace "," with ""]' />
+				<set-variable value="#[attributes.httpStatus]" doc:name="Set httpStatus" doc:id="e3d8d21d-03a2-4922-b1b5-d5dc2ef027c2" variableName="httpStatus" />
 			</on-error-propagate>
-			<on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
-				<ee:transform
-					xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-					xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"errorMessage": "Method not allowed",
-	"description": error.description
-}]]></ee:set-payload>
-					</ee:message>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6aae49c9-1eee-4e08-8e07-2f1d72c71801" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="06fefd89-ea41-4593-92bb-8397cad5218e">
+					<ee:message />
 					<ee:variables>
-						<ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+						<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+output application/java
+---
+error.muleMessage.typedValue.errorDetails default []]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-			</on-error-propagate>
-			<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
-				<ee:transform
-					xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-					xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"errorMessage": "Not acceptable",
-	"description": error.description
-}]]></ee:set-payload>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-			</on-error-propagate>
-			<on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
-				<ee:transform
-					xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-					xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"errorMessage": "Unsupported media type",
-	"description": error.description
-}]]></ee:set-payload>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-			</on-error-propagate>
-			<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
-				<ee:transform
-					xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-					xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"errorMessage": "Not Implemented",
-	"description": error.description
-}]]></ee:set-payload>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
+				<error-handler-plugin:on-error doc:id="47b878eb-f03b-429f-aa33-cbef5b4d9372" badRequestError='#[error.description default "There was an issue with your request message."]' unauthorizedError='#[error.description default "You have issues accessing the system"]' notFoundError='#[error.description default "The API has not been implemented"]' notAcceptableError='#[error.description default "One of the request or parameters is unacceptable"]' timeoutError='#[error.description default "You request to the server has been timed-out"]' unsupportedMediaTypeError='#[error.description default "Media Type not supported"]' tooManyRequestsError='#[error.description default "You have made too many requests to the server"]' serverError='#[error.description default "There is a server issue"]' methodNotAllowedError='#[error.description default "The method has not been implemented"]' connectivityError='#[error.description default "You have issues accessing the system"]' doc:name="Process Error" />
+				<set-variable value="#[attributes.httpStatus]" doc:name="Set httpStatus" doc:id="f487b458-3ebe-4fcb-ad60-3c1f68ce6b33" variableName="httpStatus" />
 			</on-error-propagate>
 		</error-handler>
 	</flow>

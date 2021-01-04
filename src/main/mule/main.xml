@@ -50,7 +50,7 @@ output application/json
 error.errorMessage.payload]]></ee:set-payload>
 						</ee:message>
 						<ee:variables>
-							<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number default 500]]></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
 				</on-error-propagate>
@@ -67,7 +67,7 @@ error.errorMessage.payload]]></ee:set-payload>
 				doc:name="Get customer by email"
 				doc:id="3e7b0f43-1cba-4f18-a6cd-54e9c387ee0b"
 				config-ref="Mico_Customer_System_API_Config"
-				email="#[message.attributes.queryParams.'email']" />
+				email="#[message.attributes.uriParams.'email']" />
 			<error-handler>
 				<on-error-propagate
 					enableNotifications="true"
@@ -85,7 +85,7 @@ output application/json
 error.errorMessage.payload]]></ee:set-payload>
 						</ee:message>
 						<ee:variables>
-							<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number default 500]]></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
 				</on-error-propagate>
@@ -125,7 +125,7 @@ output application/json
 error.errorMessage.payload]]></ee:set-payload>
 						</ee:message>
 						<ee:variables>
-							<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number default 500]]></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
 				</on-error-propagate>
@@ -156,7 +156,7 @@ output application/json
 error.errorMessage.payload]]></ee:set-payload>
 						</ee:message>
 						<ee:variables>
-							<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number default 500]]></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
 				</on-error-propagate>
@@ -206,7 +206,7 @@ error.errorMessage.payload]]></ee:set-payload>
 		</choice>
 		<try doc:name="Try" doc:id="7081d5eb-5464-4af6-8aa2-43574a982971">
 					<mico-order-system-api:post-order doc:name="Post order by calling Mico Order SAPI" doc:id="c303e14c-0093-4d16-b448-7e96bee25af4" config-ref="Mico_Order_System_API_Config" target="order" targetValue="#[message]">
-						<mico-order-system-api:post-order-request-data><![CDATA[#[%dw 2.0
+				<mico-order-system-api:post-order-request-data><![CDATA[#[%dw 2.0
 output application/json
 ---
 {
