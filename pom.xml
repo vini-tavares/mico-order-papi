@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<app.runtime>4.3.0-20201013</app.runtime>
+		<app.runtime>4.3.0</app.runtime>
 		<app.runtime.semver>${app.runtime}</app.runtime.semver>
 		<mule.maven.plugin.version>3.3.5</mule.maven.plugin.version>
 		
@@ -62,6 +62,25 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
+										<cloudHubDeployment>
+						<server>cloudhub</server>
+						<businessGroupId>cd8b296d-8848-4a91-98ed-4a47f73703bd</businessGroupId>
+						<environment>Sandbox</environment>
+						<region>us-east-2</region>
+						<muleVersion>${app.runtime.semver}</muleVersion>
+						<workers>1</workers>
+						<workerType>MICRO</workerType>
+						<objectStoreV2>true</objectStoreV2>
+						<applicationName>mico-order-papi-dev</applicationName>
+						<deploymentTimeout>800000</deploymentTimeout>
+						<properties>
+							<anypoint.platform.client_id>${ap.client_id}</anypoint.platform.client_id>
+							<anypoint.platform.client_secret>${ap.client_secret}</anypoint.platform.client_secret>
+							<anypoint.platform.config.analytics.agent.enabled>true</anypoint.platform.config.analytics.agent.enabled>
+							<anypoint.platform.visualizer.displayName>${project.artifactId}</anypoint.platform.visualizer.displayName>
+							<anypoint.platform.visualizer.layer>Process</anypoint.platform.visualizer.layer>
+						</properties>
+					</cloudHubDeployment>
 				</configuration>
 			</plugin>
 		<plugin>
