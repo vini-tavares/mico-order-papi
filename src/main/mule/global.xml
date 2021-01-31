@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule
+	xmlns:error-handler-plugin="http://www.mulesoft.org/schema/mule/error-handler-plugin"
 	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
 	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
 	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
@@ -9,8 +10,7 @@
 	xmlns:mico-customer-system-api="http://www.mulesoft.org/schema/mule/mico-customer-system-api"
 	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/mico-customer-system-api http://www.mulesoft.org/schema/mule/mico-customer-system-api/current/mule-mico-customer-system-api.xsd
@@ -18,7 +18,8 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 http://www.mulesoft.org/schema/mule/mico-order-system-api http://www.mulesoft.org/schema/mule/mico-order-system-api/current/mule-mico-order-system-api.xsd
 http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
-http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/error-handler-plugin http://www.mulesoft.org/schema/mule/error-handler-plugin/current/mule-error-handler-plugin.xsd">
 
 	<http:listener-config name="httpListenerConfig">
 		<http:listener-connection
@@ -85,5 +86,6 @@ http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mu
 		doc:id="d3060188-f5d6-4fb6-8fb0-86a54d3df98c"
 		flowRef="mico-order-papi-main" />
 	<validation:config name="validationConfig" doc:name="Validation Config" doc:id="22e925d4-3f7c-4b38-892e-d052ec6338f4" />
+	<error-handler-plugin:config name="Error_Handler_Plugin_Config" doc:name="Error Handler Plugin Config" doc:id="61182177-b74e-43fa-bc4a-89c058660d08" apiName="#[Mule::p('api.artifactId')]" />
 		
 </mule>

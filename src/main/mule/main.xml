@@ -179,29 +179,12 @@ error.errorMessage.payload]]></ee:set-payload>
 			doc:name="Choice"
 			doc:id="bb75a870-3ad6-4c30-9584-2898851d89a0">
 			<when expression="#[vars.customerCheck == null]">
-				<try doc:name="Try" doc:id="8e5d924b-efed-441e-9a75-0ceedc81f2f5">
-					<mico-customer-system-api:post-customer doc:name="Post customer by calling Mico Customer SAPI" doc:id="5bd2bee2-17bb-4982-b257-bfbbc1fce2af" config-ref="Mico_Customer_System_API_Config" target="customer" targetValue="#[message]">
+				<mico-customer-system-api:post-customer doc:name="Post customer by calling Mico Customer SAPI" doc:id="5bd2bee2-17bb-4982-b257-bfbbc1fce2af" config-ref="Mico_Customer_System_API_Config" target="customer" targetValue="#[message]">
 						<mico-customer-system-api:post-customer-request-data><![CDATA[#[%dw 2.0
 output application/json
 ---
 payload.customer]]]></mico-customer-system-api:post-customer-request-data>
 					</mico-customer-system-api:post-customer>
-					<error-handler>
-						<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="255ab99a-1667-4a6a-bc5c-94bda4df1159" type="ANY">
-							<ee:transform doc:name="Transform Message" doc:id="03c83c9d-1038-4681-90a6-2f00dfe98c96">
-								<ee:message>
-									<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-error.errorMessage.payload]]></ee:set-payload>
-								</ee:message>
-								<ee:variables>
-									<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode as Number]]></ee:set-variable>
-								</ee:variables>
-							</ee:transform>
-						</on-error-propagate>
-					</error-handler>
-				</try>
 			</when>
 		</choice>
 		<try doc:name="Try" doc:id="7081d5eb-5464-4af6-8aa2-43574a982971">
@@ -255,7 +238,7 @@ output application/json
 output application/json
 ---
 {
-	"Location": "/customers/" ++ vars.customerCheck.email as String default payload.email as String ++ "         " ++ vars.order.attributes.headers.Location as String
+	"Location": "/customers/" ++ vars.customerCheck.email as String default payload.customer.email as String ++ "         " ++ vars.order.attributes.headers.Location as String
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
